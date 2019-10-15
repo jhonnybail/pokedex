@@ -1,9 +1,9 @@
 import { FluidNavigator } from 'react-navigation-fluid-transitions';
 
-import HomeScreen from '../screens/Home';
+import PokemonList from '../screens/PokemonList';
 
 const Routes = FluidNavigator({
-    home: { screen: HomeScreen }
+    home: { screen: PokemonList }
 }, {
     initialRouteName: 'home',
     navigationOptions: {

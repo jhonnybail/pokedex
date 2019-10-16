@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
         height: '100%',
         backgroundColor: '#FFF',
         borderRadius: 10,
-        padding: 10,
         shadowColor: 'black',
         shadowRadius: -10,
         shadowOpacity: 1,
@@ -26,7 +25,8 @@ const styles = StyleSheet.create({
           width: -5,
           height: -5
         },
-        elevation: 11
+        elevation: 11,
+        overflow: 'hidden'
     }
 });
 
@@ -46,7 +46,7 @@ class App extends React.Component {
     render () {
 
         const {componentHeight} = this.state;
-
+        
         return (
             <>
                 <StatusBar />
@@ -55,7 +55,7 @@ class App extends React.Component {
                     style={{...styles.pokedex, height: componentHeight}}>
                     <View style={styles.screen}>
                         <Provider store={store}>
-                            <Navigator />
+                            <Navigator style={{margin: 10}} />
                         </Provider>
                     </View>
                 </View>

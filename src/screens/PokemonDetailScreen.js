@@ -9,7 +9,8 @@ import PokeballLoader from '../components/PokeballLoader';
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        padding: 10
     },
     image: {
         width: '100%',
@@ -43,13 +44,13 @@ class PokemonDetailScreen extends React.Component {
 
     static get propTypes() {
         return {
-            navigation: PropTypes.object
+            navigation: PropTypes.object,
+            dispatch: PropTypes.func
         };
     }
 
     componentDidMount () {
         this.fetchPokemon(this.props.navigation.state.params.name);
-        //this.fetchPokemon('charizard');
     }
 
     async fetchPokemon (name) {
@@ -57,14 +58,25 @@ class PokemonDetailScreen extends React.Component {
             ...this.state,
             isLoading: true
         })
-        const pokemon = await this.pokedex.getPokemonByName(name); 
-        const specie  = await this.pokedex.getPokemonSpeciesByName(name);
-        this.setState({
-            ...this.state,
-            pokemon,
-            specie,
-            isLoading: false
-        });
+        try{
+            const pokemon = await this.pokedex.getPokemonByName(name); 
+            const specie  = await this.pokedex.getPokemonSpeciesByName(name);
+            this.setState({
+                ...this.state,
+                pokemon,
+                specie,
+                isLoading: false
+            });
+        }catch(error){
+            this.setState({
+                ...this.state,
+                isLoading: false
+            });
+            this.props.dispatch({
+                type: 'error',
+                message: error.message
+            });
+        }
     }
 
     renderContent = ({pokemon, specie}) => (

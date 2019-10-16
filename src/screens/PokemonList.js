@@ -1,6 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Pokedex } from 'pokeapi-js-wrapper/src/index';
-import { FlatList, Text, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, View, TouchableOpacity } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import { NavigationActions } from 'react-navigation'
 
 import PokemonCard from '../components/PokemonCard';
 import PokeballLoader from '../components/PokeballLoader';
@@ -10,8 +14,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5
     },
     item: {
-        marginTop: 10,
-        borderRadius: 10
+        marginTop: 10
     }
 });
 
@@ -25,13 +28,18 @@ class PokemonList extends React.Component {
         isLoading: false
     }
 
+    static get propTypes() {
+        return {
+            navigation: PropTypes.object
+        };
+    }
+
     componentDidMount() {
         this.fetchPokemons();
     }
 
     async fetchPokemons () {
         if(this.state.isLoading) return;
-
         const { page } = this.state;
         this.setState({ ...this.state, isLoading: true });
         const pokemons = (await this.pokedex.getPokemonsList({
@@ -46,19 +54,49 @@ class PokemonList extends React.Component {
         });
     }
 
+    renderFooter = () => {
+        if (!this.state.isLoading) return null;
+          return (
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 15}}>
+                  <PokeballLoader />
+              </View>
+        );
+    };
+
+    openDetail = name => {
+        return this.props.navigation.dispatch(
+            NavigationActions.navigate({ 
+                routeName: 'pokemonDetail',
+                params: {
+                    name
+                }
+            })
+        );
+    };
+
+    renderItem = (item) => (
+        <TouchableOpacity
+            onPress={() => this.openDetail(item.name)}>
+            <Animatable.View animation="fadeInUp" iterationCount={1}>
+                <PokemonCard name={item.name} style={styles.item} />
+            </Animatable.View>
+        </TouchableOpacity>
+    )
+
     render () {
         return (
-            <FlatList
-                contentContainerStyle={styles.list}
-                data={this.state.pokemons}
-                renderItem={({item}) => <PokemonCard name={item.name} style={styles.item} />}
-                keyExtractor={item => item.name}
-                onEndReached={this.loadRepositories}
-                onEndReachedThreshold={0.1}
-            />
+              <FlatList
+                  contentContainerStyle={styles.list}
+                  data={this.state.pokemons}
+                  renderItem={({item}) => this.renderItem(item)}
+                  keyExtractor={item => item.name}
+                  onEndReached={() => this.fetchPokemons()}
+                  onEndReachedThreshold={0.1}
+                  ListFooterComponent={this.renderFooter}
+              />
         );
     }
 
 }
 
-export default PokemonList;
+export default connect()(PokemonList);

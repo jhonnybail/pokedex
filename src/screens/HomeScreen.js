@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Pokedex } from 'pokeapi-js-wrapper/src/index';
-import { FlatList, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { FlatList, StyleSheet, View, TouchableOpacity, Button, Text } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { NavigationActions } from 'react-navigation'
 
@@ -11,10 +11,21 @@ import PokeballLoader from '../components/PokeballLoader';
 
 const styles = StyleSheet.create({
     list: {
-        paddingHorizontal: 5
+        paddingHorizontal: 5,
+        margin: 10
     },
     item: {
         marginTop: 10
+    },
+    errorView: {
+        width: '100%',
+        height: 30,
+        justifyContent: 'center',
+        backgroundColor: '#e8d20f',
+        paddingLeft: 10,
+        alignItems: 'center',
+        top: 0,
+        left: 0
     }
 });
 
@@ -25,12 +36,15 @@ class HomeScreen extends React.Component {
     state = {
         pokemons: [],
         page: 0,
-        isLoading: false
+        isLoading: false,
+        error: null
     }
 
     static get propTypes() {
         return {
-            navigation: PropTypes.object
+            navigation: PropTypes.object,
+            error: PropTypes.object,
+            dispatch: PropTypes.func
         };
     }
 
@@ -40,18 +54,35 @@ class HomeScreen extends React.Component {
 
     async fetchPokemons () {
         if(this.state.isLoading) return;
+        const { error } = this.props;
         const { page } = this.state;
         this.setState({ ...this.state, isLoading: true });
-        const pokemons = (await this.pokedex.getPokemonsList({
-            limit: 10,
-            offset: page * 10
-        })).results;
         
-        this.setState({
-            pokemons: [ ...this.state.pokemons, ...pokemons ],
-            page: page + 1,
-            isLoading: false,
-        });
+        try{
+            const pokemons = (await this.pokedex.getPokemonsList({
+                limit: 10,
+                offset: page * 10
+            })).results;
+            this.setState({
+                pokemons: [ ...this.state.pokemons, ...pokemons ],
+                page: page + 1,
+                isLoading: false
+            });
+            if(error.message)
+                this.props.dispatch({
+                    type: 'error',
+                    message: null
+                });
+        }catch(error){
+            this.setState({
+                ...this.state,
+                isLoading: false
+            });
+            this.props.dispatch({
+                type: 'error',
+                message: error.message
+            });
+        }
     }
 
     renderFooter = () => {
@@ -84,19 +115,36 @@ class HomeScreen extends React.Component {
     )
 
     render () {
+
+        const { error } = this.props;
+
         return (
-              <FlatList
-                  contentContainerStyle={styles.list}
-                  data={this.state.pokemons}
-                  renderItem={({item}) => this.renderItem(item)}
-                  keyExtractor={item => item.name}
-                  onEndReached={() => this.fetchPokemons()}
-                  onEndReachedThreshold={0.1}
-                  ListFooterComponent={this.renderFooter}
-              />
+            <View>
+            {error.message
+                ?   <View style={styles.errorView}>
+                        <Text>{ error.message }</Text>
+                    </View>
+                :   null
+            }
+            {!this.state.isLoading && this.state.pokemons.length === 0
+                ?   <Button
+                        title="Reload"
+                        onPress={() => this.fetchPokemons()}
+                    />
+                :   <FlatList
+                        contentContainerStyle={styles.list}
+                        data={this.state.pokemons}
+                        renderItem={({item}) => this.renderItem(item)}
+                        keyExtractor={item => item.name}
+                        onEndReached={() => this.fetchPokemons()}
+                        onEndReachedThreshold={0.1}
+                        ListFooterComponent={this.renderFooter}
+                    />
+            }
+            </View>
         );
     }
 
 }
 
-export default connect()(HomeScreen);
+export default connect(state => ({error: state.error}))(HomeScreen);

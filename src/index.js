@@ -25,7 +25,8 @@ const styles = StyleSheet.create({
         shadowOffset: {
           width: -5,
           height: -5
-        }
+        },
+        elevation: 11
     }
 });
 

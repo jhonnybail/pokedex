@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     }
 });
 
-class PokemonList extends React.Component {
+class HomeScreen extends React.Component {
 
     pokedex = new Pokedex();
 
@@ -99,4 +99,4 @@ class PokemonList extends React.Component {
 
 }
 
-export default connect()(PokemonList);
+export default connect()(HomeScreen);

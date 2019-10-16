@@ -6,8 +6,7 @@ import {
 export default (AppNavigator) => {
     const navReducer = createNavigationReducer(AppNavigator);
     const middleware = createReactNavigationReduxMiddleware(
-        'root',
-        state => state.nav,
+        state => state.nav
     );
     return { navReducer, middleware };
 };

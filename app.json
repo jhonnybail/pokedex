@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "non-interactive",
+    "name": "pokedex",
     "slug": "pokedex",
     "privacy": "public",
     "sdkVersion": "35.0.0",
@@ -15,7 +15,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F00"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

@@ -1,20 +1,13 @@
 import { FluidNavigator } from 'react-navigation-fluid-transitions';
 
-import HomeScreen from '../screens/Home';
+import HomeScreen from '../screens/HomeScreen';
+import PokemonDetailScreen from '../screens/PokemonDetailScreen';
 
 const Routes = FluidNavigator({
-    home: { screen: HomeScreen }
+    home: { screen: HomeScreen },
+    pokemonDetail: { screen: PokemonDetailScreen }
 }, {
-    initialRouteName: 'home',
-    navigationOptions: {
-        headerTintColor: '#FFF',
-        headerStyle: {
-            height: 50,
-            marginTop: 2,
-            backgroundColor: '#000'
-        },
-        headerForceInset: true
-    }
+    initialRouteName: 'home'
 });
 
 export default Routes;

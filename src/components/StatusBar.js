@@ -23,7 +23,9 @@ const getStatusBarHeigth = async () => new Promise(resolve => {
 
 class StatusBar extends PureComponent {
 
-    state = {};
+    state = {
+        statusBarWidth: Dimensions.get('screen').width
+    };
 
     static get propTypes () {
         return {
@@ -42,6 +44,13 @@ class StatusBar extends PureComponent {
         StatusBarHeight = await getStatusBarHeigth();
     }
 
+    onLayout = () => {
+        this.setState({
+            ...this.state,
+            statusBarWidth: Dimensions.get('screen').width
+        });
+    }
+
     render() {
         const {
             barStyle, backgroundColor, translucent, hidden
@@ -51,7 +60,8 @@ class StatusBar extends PureComponent {
         const supportSO = OS === 'ios' || (OS === 'android' && Version >= 21);
         
         return (
-            <View>
+            <View
+                onLayout={this.onLayout}>
                 <SB barStyle={barStyle} backgroundColor={bgColor} translucent hidden={hidden} />
                 {!hidden && !translucent && supportSO ? <View style={{
                     backgroundColor: bgColor,
@@ -76,8 +86,8 @@ StatusBar.defaultProps = {
         android: 'light-content',
     }),
     backgroundColor: Platform.select({
-        ios: '#000000',
-        android: '#000000',
+        ios: '#F00',
+        android: '#F00',
     }),
     translucent: false,
     hidden: false,
